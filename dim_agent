@@ -1,0 +1,13 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "hechos"]}[Data],
+  #"Se han quitado otras columnas." = Table.SelectColumns(#"Navegación 2", {"pgid", "tract_id_alias", "bldg_id", "bin_id", "developable_roof_sqft", "crb_model", "owner_occupancy_status", "tilt", "azimuth", "pct_of_bldgs_developable", "bldg_size_class", "cf_bin", "sector_abbr", "eia_id", "compensation_style"}),
+  #"Inserted Merged Column" = Table.AddColumn(#"Se han quitado otras columnas.", "Agent_Key", each Text.Combine({[pgid], "-", [bldg_id]}), type text),
+  #"Columnas reordenadas" = Table.ReorderColumns(#"Inserted Merged Column", {"Agent_Key", "pgid", "tract_id_alias", "bldg_id", "bin_id", "developable_roof_sqft", "crb_model", "owner_occupancy_status", "tilt", "azimuth", "pct_of_bldgs_developable", "bldg_size_class", "cf_bin", "sector_abbr", "eia_id", "compensation_style"}),
+  #"Duplicados quitados" = Table.Distinct(#"Columnas reordenadas", {"Agent_Key"}),
+  #"Tipo de columna cambiado con configuración regional" = Table.TransformColumnTypes(#"Duplicados quitados", {{"developable_roof_sqft", type number}}, "en-US"),
+  #"Tipo de columna cambiado" = Table.TransformColumnTypes(#"Tipo de columna cambiado con configuración regional", {{"pgid", Int64.Type}, {"tract_id_alias", Int64.Type}, {"bldg_id", Int64.Type}, {"bin_id", Int64.Type}, {"developable_roof_sqft", type number}, {"owner_occupancy_status", Int64.Type}, {"tilt", Int64.Type}, {"pct_of_bldgs_developable", type number}, {"cf_bin", Int64.Type}, {"eia_id", Int64.Type}})
+in
+  #"Tipo de columna cambiado"
