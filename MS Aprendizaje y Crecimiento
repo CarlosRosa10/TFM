@@ -1,0 +1,77 @@
+Capacidad Total Batería Instalada kWh = 
+SUM('Aprendizaje_Crecimiento'[Capacidad Batería kWh])
+
+
+CAPEX Promedio Baterias = 
+AVERAGE('Aprendizaje_Crecimiento'[CAPEX Baterías kWh])
+
+
+Costo Promedio por kW = 
+AVERAGE('Aprendizaje_Crecimiento'[Gasto Capital Sistema por kW])
+
+
+
+Crecimiento Anual de Adopción % = 
+VAR Nuevos = SUM('Aprendizaje_Crecimiento'[Nuevos Adoptantes Período Actual])
+VAR Acumulados = SUM('Aprendizaje_Crecimiento'[Adoptantes Año Anterior])
+RETURN DIVIDE(Nuevos, Acumulados) 
+
+
+Eficiencia Batería Promedio = 
+AVERAGE('Aprendizaje_Crecimiento'[Eficiencia Batería])
+
+
+
+Impacto Reducción Carbono tCO2 = 
+SUMX(
+    'Aprendizaje_Crecimiento',
+    'Aprendizaje_Crecimiento'[Producción Anual Energía kWh] * 'Aprendizaje_Crecimiento'[Intensidad Carbono]
+)
+
+
+Promedio Superficie Desarrollable por Año = 
+AVERAGEX(
+    VALUES('Aprendizaje_Crecimiento'[Año]),
+    CALCULATE(
+        AVERAGE('Aprendizaje_Crecimiento'[Densidad Suelo Desarrollable])
+    )
+)
+
+
+Proporción Proyectos con ITC % = 
+DIVIDE(
+    CALCULATE(COUNTROWS('Aprendizaje_Crecimiento'), 'Aprendizaje_Crecimiento'[ITC Fraction] > 0),
+    COUNTROWS('Aprendizaje_Crecimiento')
+) * 100
+
+
+Superficie Total Instalable = 
+SUM(Aprendizaje_Crecimiento[Densidad Suelo Desarrollable])
+
+
+
+Vida Útil Económica Promedio = 
+AVERAGE('Aprendizaje_Crecimiento'[Vida Útil Económica Sistema])
+
+
+
+
+Valor = SWITCH(TRUE(), 
+              SELECTEDVALUE('Métricas'[Medidas]) = "Ratio Mejora Coste (kW)", [Costo Promedio por kW],
+                SELECTEDVALUE('Métricas'[Medidas]) = "Reducción CAPEX Baterías", [CAPEX Promedio Baterias],
+                SELECTEDVALUE('Métricas'[Medidas]) = "Superficie Desarrollable", [Promedio Superficie Desarrollable por Año], 
+                SELECTEDVALUE('Métricas'[Medidas]) = "Mejora Eficiencia Batería", [Eficiencia Batería Promedio],
+                SELECTEDVALUE('Métricas'[Medidas]) = "Crecimiento Anual de Adopción", [Crecimiento Anual de Adopción %], 
+                SELECTEDVALUE('Métricas'[Medidas]) = "Impacto Reducción Carbono tCO2", [Impacto Reducción Carbono tCO2])
+
+
+Y la tabla de métricas:
+Medidas	                        Grupo Funcional	          Formato	      Signo
+Ratio Mejora Coste (kW)	        Aprendizaje Económico	    Porcentaje	  Positivo
+Reducción CAPEX Baterías	      Aprendizaje Económico	    Porcentaje	  Positivo
+Superficie Desarrollable	      Aprendizaje Técnico	      Entero	      Positivo
+Mejora Eficiencia Batería	      Aprendizaje Técnico	      Porcentaje	  Positivo
+Crecimiento Anual de Adopción	  Impacto Ambiental	        Porcentaje	  Positivo
+Impacto Reducción Carbono tCO2	Impacto Ambiental	        Entero	      Positivo
+
+
