@@ -1,0 +1,62 @@
+-- Medidas
+
+Ahorro Total Primer Año = 
+SUM(Clientes[Ahororo Factura Eléctrica Primer Año Sistema])
+
+
+Clientes Elegibles NEM = 
+CALCULATE(
+    SUM(Clientes[Número Edificios por Agente]),
+    FILTER(Clientes, Clientes[Tamaño Máximo Sistema para NEM] > 0)
+)
+
+
+Cobertura Pico = 
+DIVIDE(
+    SUM(Clientes[Potencia Sistema kW]),
+    SUM(Clientes[Máxima Demanda kW])
+) 
+
+
+Crecimiento Cuota Mercado = 
+DIVIDE(
+    SUM(Clientes[Cuota Mercado Actual]) - SUM(Clientes[Porncetaje Mercado Año Anterior]),
+    SUM(Clientes[Porncetaje Mercado Año Anterior])
+) 
+
+
+
+Nuevos Adoptantes = 
+  SUM(Clientes[Nuevos Adoptantes])
+
+
+Tasa Elegibilidad NEM = 
+DIVIDE(
+    [Clientes Elegibles NEM],
+    SUM(Clientes[Número Edificios por Agente])
+)
+
+
+Valor Resiliencia Total = 
+    SUM(Clientes[Valor Resiliencia USD])
+
+
+Valor = SWITCH(TRUE(), 
+SELECTEDVALUE('Métricas'[Medida]) = "Ahorro Primer Año", [Ahorro Total Primer Año],
+SELECTEDVALUE('Métricas'[Medida]) = "Clientes Elegibles NEM", [Clientes Elegibles NEM],
+SELECTEDVALUE('Métricas'[Medida]) = "Nuevos Adoptantes", [Nuevos Adoptantes], 
+SELECTEDVALUE('Métricas'[Medida]) = "Crecimiento Cuota Mercado", [Crecimiento Cuota Mercado],
+SELECTEDVALUE('Métricas'[Medida]) = "Cobertura Demanda Máxima", [Cobertura Pico],
+SELECTEDVALUE('Métricas'[Medida]) = "Valor Resiliencia Total", [Valor Resiliencia Total])
+
+
+
+Para la tabla de métricas, se introducen a mano los valores con los siguientes valores: 
+
+Medida	                              Grupo Funcional	  Formato	          Signo
+Ahorro Primer Año	                    Inicial	          Decimal USD	      Positivo
+Clientes Elegibles NEM	              Inicial	          Entero	          Positivo
+Nuevos Adoptantes	                    Adopción	        Entero	          Positivo
+Crecimiento Cuota Mercado	            Adopción	        Porcentaje	      Positivo
+Cobertura Demanda Máxima	            Adecuación	      Porcentaje	      Depende
+Valor Resiliencia Total	              Adecuación	      Decimal USD	      Positivo
