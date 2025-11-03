@@ -1,0 +1,58 @@
+Capacidad Instalada Anual = 
+SUM(Procesos[Potencia Adicional Nuevos Sistemas Período])
+
+
+Costo de O&M Ponderado = 
+DIVIDE(
+    SUMX(Procesos, Procesos[Costes O&M por kW] * Procesos[Potencia Sistema kW]),
+    SUM(Procesos[Potencia Sistema kW])
+)
+
+
+
+Densidad de Potencia Instalada = 
+DIVIDE(
+    SUM(Procesos[Potencia Sistema kW]),
+    SUM(Procesos[Densidad Potencia Fotovoltaica kWsqft])
+)
+
+
+Eficiencia de Diseño = 
+DIVIDE(
+    SUM(Procesos[Producción Anual Energía kWh]),
+    SUM(Procesos[Potencia Sistema kW])
+)
+
+
+Factor de Capacidad Ponderado = 
+DIVIDE(
+    SUMX(Procesos, Procesos[Factor Capacidad] * Procesos[Potencia Sistema kW]),
+    SUM(Procesos[Potencia Sistema kW])
+)
+
+
+Tasa de Integración Tecnológica = 
+DIVIDE(
+    COUNTROWS(FILTER(Procesos, Procesos[Potencia Batería kW] > 0)),
+    COUNTROWS(FILTER(Procesos, Procesos[Potencia Sistema kW] > 0))
+) 
+
+
+Valor = SWITCH(TRUE(), 
+              SELECTEDVALUE('Métricas'[Medida]) = "Capacidad Instalada Anual", [Capacidad Instalada Anual], 
+              SELECTEDVALUE('Métricas'[Medida]) = "Costo de O&M Ponderado", [Costo de O&M Ponderado], 
+              SELECTEDVALUE('Métricas'[Medida]) = "Densidad de Potencia Instalada", [Densidad de Potencia Instalada],
+              SELECTEDVALUE('Métricas'[Medida]) =  "Eficiencia de Diseño", [Eficiencia de Diseño], 
+              SELECTEDVALUE('Métricas'[Medida]) = "Factor de Capacidad Ponderado", [Factor de Capacidad Ponderado], 
+              SELECTEDVALUE('Métricas'[Medida]) = "Tasa de Integración Tecnológica", [Tasa de Integración Tecnológica])
+
+
+
+Y la tabla de métricas: 
+Medida	                        Grupo Funcional	Formato	    Signo
+Capacidad Instalada Anual	      Expansión	      Decimal	    Positivo
+Costo de O&M Ponderado	        Coste	          Moneda USD	Negativo
+Densidad de Potencia Instalada	Expansión	      Decimal	    Positivo
+Eficiencia de Diseño	          Diseño	        Decimal	    Positivo
+Factor de Capacidad Ponderado	  Diseño	        Porcentaje	Positivo
+Tasa de Integración Tecnológica	Coste	          Porcentaje	Positivo
