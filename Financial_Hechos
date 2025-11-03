@@ -1,0 +1,15 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "hechos", Item = "fact_diffusion_agents_outputs"]}[Data],
+  #"Se han quitado otras columnas." = Table.SelectColumns(#"Navegación 2", {"Agent_Key", "county_id", "tariff_id", "year", "wholesale_elec_price_dollars_per_kwh", "system_kw", "batt_kw", "batt_kwh", "npv", "payback_period", "annual_energy_production_kwh", "first_year_elec_bill_savings", "system_capex_per_kw", "system_om_per_kw", "system_variable_om_per_kw", "batt_capex_per_kwh", "batt_capex_per_kw"}),
+  #"Personalizado agregado" = Table.TransformColumnTypes(Table.AddColumn(#"Se han quitado otras columnas.", "total_capex_usd", each ([system_capex_per_kw]*[system_kw])+([batt_capex_per_kw]*[batt_kw]) + ([batt_capex_per_kwh]*[batt_kwh])), {{"total_capex_usd", type number}}),
+  #"Personalizado agregado 1" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado", "total_om_usd", each ([system_om_per_kw] + [system_variable_om_per_kw])*[system_kw]), {{"total_om_usd", type number}}),
+  #"Personalizado agregado 2" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado 1", "market_exposure_usd", each [annual_energy_production_kwh] * [wholesale_elec_price_dollars_per_kwh]), {{"market_exposure_usd", type number}}),
+  #"Personalizado agregado 3" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado 2", "roi", each ([first_year_elec_bill_savings]-[total_om_usd])/[total_capex_usd]), {{"roi", type number}}),
+  #"Personalizado agregado 4" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado 3", "margen_operativo", each ([first_year_elec_bill_savings]-[total_om_usd])/[system_kw]), {{"margen_operativo", type number}}),
+  #"Personalizado agregado 5" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado 4", "Coste Medio Por Kw Instalado", each [total_capex_usd] / [system_kw]), {{"Coste Medio Por Kw Instalado", type number}}),
+  #"Columnas con nombre cambiado" = Table.RenameColumns(#"Personalizado agregado 5", {{"year", "Año"}, {"wholesale_elec_price_dollars_per_kwh", "Precio Electricidad kWh"}, {"system_kw", "Potencia Sistema Kw"}, {"batt_kw", "Potencia Batería Kw"}, {"batt_kwh", "Capacidad Batería Kwh"}, {"npv", "Valor Presente Neto"}, {"payback_period", "Período Payback"}, {"annual_energy_production_kwh", "Producción Anual Kwh"}, {"first_year_elec_bill_savings", "Ahorro Factura Primer Año"}, {"system_capex_per_kw", "Gasto Capital por Kw"}, {"system_om_per_kw", "Coste Operacional Mantenimiento por kW"}, {"system_variable_om_per_kw", "Coste Operacional Variable Mantenimiento por kW"}, {"batt_capex_per_kwh", "CAPEX por kWh Almacenamiento"}, {"batt_capex_per_kw", "CAPEX por kW Potencia Batería"}, {"total_capex_usd", "CAPEX USD"}, {"total_om_usd", "Coste Total Mantenimiento USD"}, {"market_exposure_usd", "Exposición Mercado USD"}, {"margen_operativo", "Margen Operativo"}, {"roi", "ROI"}})
+in
+  #"Columnas con nombre cambiado"
