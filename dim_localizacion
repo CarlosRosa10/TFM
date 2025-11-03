@@ -1,3 +1,19 @@
+Primero se carga la tabla de hechos para posteriormente cruzar con la dimensional
+
+Tabla hechos:
+
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "hechos"]}[Data]
+in
+  #"Navegación 2"
+
+Se genera la dimensional
+
+Tabla county_geoms:
+
 let
   Origen = Fabric.Warehouse(null),
   Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
@@ -10,3 +26,5 @@ let
   #"Duplicados quitados" = Table.Distinct(#"Tipo de columna cambiado", {"county_id"})
 in
   #"Duplicados quitados"
+
+
