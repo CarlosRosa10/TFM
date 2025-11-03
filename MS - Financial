@@ -1,0 +1,60 @@
+CAPEX Medio por kW = 
+DIVIDE(
+    SUM(Financial[CAPEX USD]),
+    SUM(Financial[Potencia Sistema Kw])
+)
+
+
+
+Margen Operativo por kW = 
+DIVIDE(
+    SUM(Financial[Ahorro Factura Primer Año]) - SUM(Financial[Coste Total Mantenimiento USD]),
+    SUM(Financial[Potencia Sistema Kw])
+)
+
+
+
+NPV Medio = 
+DIVIDE(
+    SUM(Financial[Valor Presente Neto]),
+    SUM(Financial[Potencia Sistema Kw])
+)
+
+
+Payback Medio = 
+AVERAGE(Financial[Período Payback])
+
+
+
+ROI Anual (%) = 
+DIVIDE(
+    SUM(Financial[Ahorro Factura Primer Año]) - SUM(Financial[Coste Total Mantenimiento USD]),
+    SUM(Financial[CAPEX USD])
+) 
+
+
+
+Valor Expuesto Mercado = 
+SUMX(
+    Financial,
+    Financial[Producción Anual Kwh] * Financial[Precio Electricidad kWh]
+)
+
+
+Valor = SWITCH(TRUE(), 
+            SELECTEDVALUE('Métricas'[Medida]) = "CAPEX Medio por kW", [CAPEX Medio por kW], 
+            SELECTEDVALUE('Métricas'[Medida]) = "Margen Operativo por kW", [Margen Operativo por kW], 
+            SELECTEDVALUE('Métricas'[Medida]) = "NPV Medio", [NPV Medio], 
+            SELECTEDVALUE('Métricas'[Medida]) = "Payback Medio", [Payback Medio], 
+            SELECTEDVALUE('Métricas'[Medida]) = "ROI Anual (%)", [ROI Anual (%)], 
+            SELECTEDVALUE('Métricas'[Medida]) = "Valor Expuesto Mercado", [Valor Expuesto Mercado])
+
+
+La tabla de métricas tiene la siguiente forma: 
+Medida	                  Grupo Funcional	        Formato	      Signo
+CAPEX Medio por kW	      Recuperación Inversión	Moneda USD	  Negativo
+Margen Operativo por kW	  Operación y Exposición	Moneda USD	  Positivo
+NPV Medio	                Rentabilidad	          Moneda USD	  Positivo
+Payback Medio            	Recuperación Inversión 	Decimal	      Negativo
+ROI Anual (%)            	Rentabilidad	          Porcentaje	  Positivo
+Valor Expuesto Mercado	  Operación y Exposición 	Moneda USD	  Negativo
