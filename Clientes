@@ -1,0 +1,14 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "hechos", Item = "fact_diffusion_agents_outputs"]}[Data],
+  #"Se han quitado otras columnas." = Table.SelectColumns(#"Navegación 2", {"Agent_Key", "max_demand_kw", "avg_monthly_kwh", "cf_bin", "ba", "rto", "county_id", "tariff_id", "year", "customers_in_bin", "compensation_style", "nem_system_kw_limit", "value_of_resiliency_usd", "system_kw", "first_year_elec_bill_with_system", "first_year_elec_bill_savings", "first_year_elec_bill_without_system", "adopters_cum_last_year", "market_share_last_year", "market_share", "new_adopters"}),
+  #"Personalizado agregado" = Table.TransformColumnTypes(Table.AddColumn(#"Se han quitado otras columnas.", "Tasa Adopción Segmentos Objetivo", each [new_adopters] / [customers_in_bin]), {{"Tasa Adopción Segmentos Objetivo", type number}}),
+  #"Personalizado agregado 1" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado", "Crecimiento Cuota Mercado", each if [market_share_last_year] <> 0 then([market_share]-[market_share_last_year])/[market_share_last_year]
+else null), {{"Crecimiento Cuota Mercado", type number}}),
+  #"Personalizado agregado 2" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado 1", "Cobertura Pico", each [system_kw] / [max_demand_kw]), {{"Cobertura Pico", type number}}),
+  #"Personalizado agregado 3" = Table.TransformColumnTypes(Table.AddColumn(#"Personalizado agregado 2", "Elegibilidad NEM", each if [nem_system_kw_limit]>0 then [customers_in_bin] else 0), {{"Elegibilidad NEM", type number}}),
+  #"Columnas con nombre cambiado" = Table.RenameColumns(#"Personalizado agregado 3", {{"max_demand_kw", "Máxima Demanda kW"}, {"avg_monthly_kwh", "Carga Promedio Mensual Consumida por Agente"}, {"cf_bin", "CF Bin"}, {"ba", "BA"}, {"rto", "RTO"}, {"county_id", "ID County"}, {"tariff_id", "ID Tarifa"}, {"year", "Año"}, {"customers_in_bin", "Número Edificios por Agente"}, {"compensation_style", "Estilo Compensación"}, {"nem_system_kw_limit", "Tamaño Máximo Sistema para NEM"}, {"value_of_resiliency_usd", "Valor Resiliencia USD"}, {"system_kw", "Potencia Sistema kW"}, {"first_year_elec_bill_with_system", "Factura Elétrica Primer Año Sistema Instalado"}, {"first_year_elec_bill_savings", "Ahororo Factura Eléctrica Primer Año Sistema"}, {"first_year_elec_bill_without_system", "Factura Eléctrica Primer Año Sin Sistema"}, {"adopters_cum_last_year", "Adoptantes Año Anterior"}, {"market_share_last_year", "Porncetaje Mercado Año Anterior"}, {"market_share", "Cuota Mercado Actual"}, {"new_adopters", "Nuevos Adoptantes"}})
+in
+  #"Columnas con nombre cambiado"
