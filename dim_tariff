@@ -1,0 +1,10 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "hechos"]}[Data],
+  #"Se han quitado otras columnas." = Table.SelectColumns(#"Navegación 2", {"tariff_id", "tariff_name"}),
+  #"Duplicados quitados" = Table.Distinct(#"Se han quitado otras columnas.", {"tariff_id", "tariff_name"}),
+  #"Tipo de columna cambiado" = Table.TransformColumnTypes(#"Duplicados quitados", {{"tariff_id", Int64.Type}})
+in
+  #"Tipo de columna cambiado"
