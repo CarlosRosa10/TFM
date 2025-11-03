@@ -1,0 +1,12 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "hechos", Item = "fact_diffusion_agents_outputs"]}[Data],
+  #"Se han quitado otras columnas." = Table.SelectColumns(#"Navegación 2", {"year", "tariff_id", "county_id", "rto", "ba", "cf_bin", "Agent_Key", "compensation_style", "batt_eff", "pv_kw_per_sqft", "pv_degradation_factor", "system_capex_per_kw", "batt_capex_per_kwh", "grid_carbon_intensity_tco2_per_kwh", "economic_lifetime_yrs", "itc_fraction_of_capex", "batt_kwh", "annual_energy_production_kwh", "adopters_cum_last_year", "new_adopters", "developable_roof_sqft"}),
+  #"Personalizado agregado" = Table.AddColumn(#"Se han quitado otras columnas.", "Impacto Reducción Carbono", each [annual_energy_production_kwh] * [grid_carbon_intensity_tco2_per_kwh]),
+  #"Columnas con nombre cambiado" = Table.RenameColumns(#"Personalizado agregado", {{"year", "Año"}, {"tariff_id", "ID Tarifa"}, {"county_id", "ID  County"}, {"rto", "RTO"}, {"ba", "BA"}, {"cf_bin", "CF Bin"}, {"compensation_style", "Estilo Compensación"}, {"batt_eff", "Eficiencia Batería"}, {"pv_kw_per_sqft", "Densidad Potencia Fotovoltaica kVsqft"}, {"pv_degradation_factor", "Tasa Degradación Rendimiento Paneles"}, {"system_capex_per_kw", "Gasto Capital Sistema por kW"}, {"batt_capex_per_kwh", "CAPEX Baterías kWh"}, {"grid_carbon_intensity_tco2_per_kwh", "Intensidad Carbono"}, {"economic_lifetime_yrs", "Vida Útil Económica Sistema"}, {"itc_fraction_of_capex", "ITC Fraction"}, {"batt_kwh", "Capacidad Batería kWh"}, {"annual_energy_production_kwh", "Producción Anual Energía kWh"}, {"adopters_cum_last_year", "Adoptantes Año Anterior"}, {"new_adopters", "Nuevos Adoptantes Período Actual"}}),
+  #"Tipo de columna cambiado" = Table.TransformColumnTypes(#"Columnas con nombre cambiado", {{"Impacto Reducción Carbono", type number}}),
+  #"Columnas con nombre cambiado 1" = Table.RenameColumns(#"Tipo de columna cambiado", {{"developable_roof_sqft", "Densidad Suelo Desarrollable"}})
+in
+  #"Columnas con nombre cambiado 1"
