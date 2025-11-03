@@ -1,0 +1,12 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "dbo", Item = "county_geoms"]}[Data],
+  #"Consultas combinadas" = Table.NestedJoin(#"Navegación 2", {"county_id"}, hechos, {"county_id"}, "hechos", JoinKind.Inner),
+  #"hechos expandido" = Table.ExpandTableColumn(#"Consultas combinadas", "hechos", {"census_division_abbr", "nerc_region_abbr"}, {"census_division_abbr", "nerc_region_abbr"}),
+  #"Columnas reordenadas" = Table.ReorderColumns(#"hechos expandido", {"county_id", "state_abbr", "state_fips", "state", "county", "census_division_abbr", "nerc_region_abbr"}),
+  #"Tipo de columna cambiado" = Table.TransformColumnTypes(#"Columnas reordenadas", {{"county_id", Int64.Type}}),
+  #"Duplicados quitados" = Table.Distinct(#"Tipo de columna cambiado", {"county_id"})
+in
+  #"Duplicados quitados"
