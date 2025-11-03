@@ -1,0 +1,12 @@
+let
+  Origen = Fabric.Warehouse(null),
+  Navegación = Origen{[workspaceId = "1068a9fd-ba90-43ca-9c93-cb2f2af57b22"]}[Data],
+  #"Navegación 1" = Navegación{[warehouseId = "1c9a298d-55cc-49c9-ab52-92aedee1aa70"]}[Data],
+  #"Navegación 2" = #"Navegación 1"{[Schema = "hechos", Item = "fact_diffusion_agents_outputs"]}[Data],
+  #"Se han quitado otras columnas." = Table.SelectColumns(#"Navegación 2", {"Agent_Key", "cf_bin", "ba", "rto", "county_id", "tariff_id", "year", "pv_kw_per_sqft", "system_om_per_kw", "system_kw", "batt_kw", "annual_energy_production_kwh", "capacity_factor", "new_system_kw"}),
+  #"Personalizado agregado" = Table.AddColumn(#"Se han quitado otras columnas.", "Eficiencia Diseño", each [annual_energy_production_kwh] / [system_kw]),
+  #"Personalizado agregado 1" = Table.AddColumn(#"Personalizado agregado", "Costo O&M", each [system_om_per_kw] * [system_kw]),
+  #"Tipo de columna cambiado" = Table.TransformColumnTypes(#"Personalizado agregado 1", {{"Eficiencia Diseño", type number}, {"Costo O&M", type number}}),
+  #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo de columna cambiado", {{"cf_bin", "CF Bin"}, {"ba", "BA"}, {"rto", "RTO"}, {"county_id", "ID County"}, {"tariff_id", "ID Tarifa"}, {"year", "Año"}, {"pv_kw_per_sqft", "Densidad Potencia Fotovoltaica kWsqft"}, {"system_om_per_kw", "Costes O&M por kW"}, {"system_kw", "Potencia Sistema kW"}, {"batt_kw", "Potencia Batería kW"}, {"annual_energy_production_kwh", "Producción Anual Energía kWh"}, {"capacity_factor", "Factor Capacidad"}, {"new_system_kw", "Potencia Adicional Nuevos Sistemas Período"}})
+in
+  #"Columnas con nombre cambiado"
